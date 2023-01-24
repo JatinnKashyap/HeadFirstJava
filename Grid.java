@@ -1,6 +1,9 @@
 package DotComGame;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Grid {
     private int level;
@@ -10,7 +13,7 @@ public class Grid {
     private int numberOfDotComs;
     private int currentDotComs;
     private int moves;
-    private int grid[][];
+    private Map<String,Integer> grid;
     private Player player;
 
     public Grid(Player player) {
@@ -23,7 +26,7 @@ public class Grid {
 
     public void initializeGameboard() {
         this.moves = 0;
-        this.grid = new int[this.gridSize][this.gridSize];
+        this.grid = new HashMap<String,Integer>();
         this.dotcoms = new int[this.numberOfDotComs];
         Arrays.fill(this.dotcoms, this.dotComlength);
         this.currentDotComs = this.numberOfDotComs;
@@ -34,7 +37,7 @@ public class Grid {
                 boolean possible = true;
                 if (startPointx + this.dotComlength <= this.gridSize) {
                     for (int j = 0; j < this.dotComlength; j++) {
-                        if (grid[startPointx + j][startPointy] != 0){
+                        if (this.grid.containsKey((startPointx + j) + " " + startPointy)){
                             possible = false;
                             break;
                         }
@@ -42,16 +45,15 @@ public class Grid {
                 }else possible = false;
                 if (possible) {
                     for (int j = 0; j < this.dotComlength ; j++) {
-                        this.grid[startPointx + j][startPointy] = i+1;
+                        this.grid.put((startPointx + j) + " " + startPointy, i+1);
                     }
-
                     i++;
                 }
             }else{
                 boolean possible = true;
                 if (startPointy + this.dotComlength <= this.gridSize) {
                     for (int j = 0; j < this.dotComlength; j++) {
-                        if (grid[startPointx][startPointy + j] != 0) {
+                        if (this.grid.containsKey(startPointx+" "+(startPointy + j))) {
                             possible = false;
                             break;
                         }
@@ -59,7 +61,7 @@ public class Grid {
                 }else possible = false;
                 if (possible) {
                     for (int j = 0; j < this.dotComlength ; j++) {
-                        grid[startPointx][startPointy+j] = i+1;
+                        this.grid.put(startPointx+" "+(startPointy + j), i+1);
                     }
 
                     i++;
@@ -69,12 +71,9 @@ public class Grid {
     }
     public void displayGameBoard(){
         System.out.println("The gameboard looks like this \n");
-        for(int i = 0 ; i < this.gridSize; i++){
-            for(int j = 0; j < this.gridSize; j++)
-                System.out.print(this.grid[i][j]+" ");
-            System.out.println();
-        }
-        System.out.println();
+        for(Map.Entry<String, Integer> me : this.grid.entrySet())
+            System.out.println("row  column :: "+me.getKey()+" --> has the www."+me.getValue()+".com");
+         System.out.println();
     }
 
     public void incrementLevel(){
@@ -99,11 +98,12 @@ public class Grid {
     }
     public void attack(int row,int col){
         this.moves++;
-        if(this.grid[row][col] != 0){
+        String key = row + " " + col;
+        if(this.grid.containsKey(key)){
             System.out.println("Hit!!");
-            this.dotcoms[this.grid[row][col]-1]--;
-            if(this.dotcoms[this.grid[row][col]-1] == 0){
-                System.out.println("boom! www." +this.grid[row][col]+ ".com has been decimated!");
+            this.dotcoms[this.grid.get(key)-1]--;
+            if(this.dotcoms[this.grid.get(key)-1] == 0){
+                System.out.println("boom! www." +this.grid.get(key)+ ".com has been decimated!");
                 this.currentDotComs--;
                 if(this.currentDotComs == 0){
                     System.out.println("All the dotcoms have been destroyed!!.\nYou move on to the next level.");
@@ -113,7 +113,7 @@ public class Grid {
 
                 }
             }
-            this.grid[row][col] = 0;
+            this.grid.remove(key);
         }else{
             System.out.println("Miss!!");
         }
