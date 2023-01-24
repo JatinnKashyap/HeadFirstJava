@@ -23,6 +23,6 @@ public class Player {
     }
     public void increamentPlayerLevel(int moves){
         this.level++;
-        this.rating += Math.min(0,50-moves);
+        this.rating += Math.max(0,50-moves);
     }
 }
